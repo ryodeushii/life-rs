@@ -11,6 +11,7 @@ pub struct Grid {
     pub cells: Vec<Cell>,
     pub prev_cells: Vec<Cell>,
     pub generation: u32,
+    pub max_generations: u32,
 }
 
 impl Grid {
@@ -28,6 +29,7 @@ impl Grid {
 
         Grid {
             generation: 0,
+            max_generations: width * height,
             width,
             height,
             cells,
@@ -77,6 +79,10 @@ impl Grid {
     }
 
     pub fn next_generation(&mut self) -> bool {
+        if self.generation >= self.max_generations {
+            println!("Max generations reached, exiting...");
+            return false;
+        }
         self.prev_cells = self.cells.clone();
         let mut next_cells = Vec::with_capacity(self.cells.len());
 
@@ -109,7 +115,8 @@ impl Grid {
 
         self.cells = next_cells;
         if self.prev_cells == self.cells {
-            println!("Stable grid found, exiting...");
+            println!("Stabilized at generation {}", self.generation);
+
             return false;
         }
         self.generation += 1;

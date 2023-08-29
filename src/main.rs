@@ -1,5 +1,5 @@
 use clap::{arg, Arg, Command};
-use life::game::grid::*;
+use life::{clrscr, game::grid::*};
 
 fn main() {
     let command = Command::new("Conway's Game of Life")
@@ -23,23 +23,28 @@ fn main() {
                 .default_value("25")
                 .required(false),
         )
+        .arg(
+            Arg::new("fps")
+                .short('F')
+                .long("fps")
+                .help("Frames per second")
+                .default_value("20")
+                .required(false),
+        )
         .get_matches();
     let width: u32 = command.get_one::<String>("width").unwrap().parse().unwrap();
-    let height = command
+    let height: u32 = command
         .get_one::<String>("height")
         .unwrap()
         .parse()
         .unwrap();
+    let fps: u32 = command.get_one::<String>("fps").unwrap().parse().unwrap();
     let mut random_grid = Grid::new(width, height, Some(true));
     // sleep
     std::thread::sleep(std::time::Duration::from_millis(50));
     while random_grid.next_generation() {
+        clrscr();
         println!("{}", random_grid);
-        std::thread::sleep(std::time::Duration::from_millis(50));
+        std::thread::sleep(std::time::Duration::from_millis((1000 / fps).into()));
     }
-    println!("Final generation: {}", random_grid);
-    println!(
-        "It took {} generations to stabilize",
-        random_grid.generation
-    );
 }
