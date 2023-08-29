@@ -42,6 +42,22 @@ impl Grid {
     }
 
     pub fn get_cell(&self, x: i32, y: i32) -> Option<Cell> {
+        // lets assume, that we have a grid as circular rectangle
+        // so if we go out of bounds, we go to the opposite side
+        let x = if x < 0 {
+            self.width as i32 + x
+        } else if x >= self.width as i32 {
+            x - self.width as i32
+        } else {
+            x
+        };
+        let y = if y < 0 {
+            self.height as i32 + y
+        } else if y >= self.height as i32 {
+            y - self.height as i32
+        } else {
+            y
+        };
         let idx: i32 = y * self.width.try_into().unwrap_or(0) + x;
         if idx as u32 >= self.cells.len() as u32 || x < 0 || y < 0 {
             return None;
@@ -79,8 +95,12 @@ impl Grid {
     }
 
     pub fn next_generation(&mut self) -> bool {
+        // if we reached the max number of generations, exit
         if self.generation >= self.max_generations {
-            println!("Max generations reached, exiting...");
+            println!(
+                "Max generations reached ({}), exiting...",
+                self.max_generations
+            );
             return false;
         }
         self.prev_cells = self.cells.clone();

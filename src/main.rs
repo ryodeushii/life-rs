@@ -1,4 +1,4 @@
-use clap::{arg, Arg, Command};
+use clap::{Arg, Command};
 use life::{clrscr, game::grid::*};
 
 fn main() {
