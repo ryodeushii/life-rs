@@ -31,7 +31,7 @@ impl Grid {
         Grid {
             generation: 0,
             circular,
-            max_generations: width * height,
+            max_generations: width * height * 3,
             width,
             height,
             cells,
