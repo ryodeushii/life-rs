@@ -4,7 +4,7 @@ use serde::Serialize;
 
 use super::cell::{Cell, CellState, Cells};
 
-#[derive(Clone, PartialEq, Eq, Hash, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize)]
 pub struct Grid {
     pub width: u32,
     pub height: u32,
@@ -12,10 +12,11 @@ pub struct Grid {
     pub prev_cells: Vec<Cell>,
     pub generation: u32,
     pub max_generations: u32,
+    pub circular: bool,
 }
 
 impl Grid {
-    pub fn new(width: u32, height: u32, randomize: Option<bool>) -> Grid {
+    pub fn new(width: u32, height: u32, randomize: Option<bool>, circular: bool) -> Grid {
         let randomize = randomize.unwrap_or(false);
         let cells = (0..width * height)
             .map(|_| {
@@ -29,6 +30,7 @@ impl Grid {
 
         Grid {
             generation: 0,
+            circular,
             max_generations: width * height,
             width,
             height,
@@ -42,22 +44,26 @@ impl Grid {
     }
 
     pub fn get_cell(&self, x: i32, y: i32) -> Option<Cell> {
-        // lets assume, that we have a grid as circular rectangle
-        // so if we go out of bounds, we go to the opposite side
-        let x = if x < 0 {
-            self.width as i32 + x
-        } else if x >= self.width as i32 {
-            x - self.width as i32
-        } else {
-            x
-        };
-        let y = if y < 0 {
-            self.height as i32 + y
-        } else if y >= self.height as i32 {
-            y - self.height as i32
-        } else {
-            y
-        };
+        let mut x = x;
+        let mut y = y;
+        if self.circular {
+            // lets assume, that we have a grid as circular rectangle
+            // so if we go out of bounds, we go to the opposite side
+            x = if x < 0 {
+                self.width as i32 + x
+            } else if x >= self.width as i32 {
+                x - self.width as i32
+            } else {
+                x
+            };
+            y = if y < 0 {
+                self.height as i32 + y
+            } else if y >= self.height as i32 {
+                y - self.height as i32
+            } else {
+                y
+            };
+        }
         let idx: i32 = y * self.width.try_into().unwrap_or(0) + x;
         if idx as u32 >= self.cells.len() as u32 || x < 0 || y < 0 {
             return None;

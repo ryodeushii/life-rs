@@ -31,6 +31,14 @@ fn main() {
                 .default_value("20")
                 .required(false),
         )
+        .arg(
+            Arg::new("circular")
+                .short('C')
+                .num_args(0)
+                .long("circular")
+                .help("Circular plane grid")
+                .required(false),
+        )
         .get_matches();
     let width: u32 = command.get_one::<String>("width").unwrap().parse().unwrap();
     let height: u32 = command
@@ -38,13 +46,14 @@ fn main() {
         .unwrap()
         .parse()
         .unwrap();
+    let circular: bool = command.get_flag("circular");
     let fps: u32 = command.get_one::<String>("fps").unwrap().parse().unwrap();
-    let mut random_grid = Grid::new(width, height, Some(true));
+    let mut grid = Grid::new(width, height, Some(true), circular);
     // sleep
     std::thread::sleep(std::time::Duration::from_millis(50));
-    while random_grid.next_generation() {
+    while grid.next_generation() {
         clrscr();
-        println!("{}", random_grid);
+        println!("{}", grid);
         std::thread::sleep(std::time::Duration::from_millis((1000 / fps).into()));
     }
 }
