@@ -54,6 +54,10 @@ fn main() {
     while grid.next_generation() {
         clrscr();
         println!("{}", grid);
+        println!(
+            "Limit: {}, Current generation: {}",
+            grid.max_generations, grid.generation
+        );
         std::thread::sleep(std::time::Duration::from_millis((1000 / fps).into()));
     }
 }
